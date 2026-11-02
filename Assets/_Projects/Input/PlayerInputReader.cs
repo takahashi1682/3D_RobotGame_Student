@@ -1,7 +1,9 @@
 using MyUtils;
+using MyUtils.VContainerExtensions;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace _Projects.Input
 {
@@ -16,6 +18,8 @@ namespace _Projects.Input
         private InputSystem_Actions _actions;
         public InputSystem_Actions.PlayerActions Player { get; private set; }
 
+        [Inject] private IUpdateObservable _updateObservable;
+
         protected override void Awake()
         {
             base.Awake(); // AbstractUnitControllableのAwake()を呼び出す
@@ -23,10 +27,10 @@ namespace _Projects.Input
             Player = _actions.Player; // プレイヤーのアクションマップを取得
             Player.AddCallbacks(this); // コールバックを登録（下で定義しているOnMoveなどのメソッドが呼ばれるようになる）
 
-            //InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsManually;
-            // _updateObservable.OnUpdate(EUpdatePhase.Input)
-            //     .Subscribe(_ => OnPhaseUpdate())
-            //     .AddTo(this);
+            // InputSystemの更新モードを手動に設定する
+            InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsManually;
+            // IUpdateObservableのOnUpdateイベントに、Inputのタイミングで手動更新するように処理を登録する
+            _updateObservable.OnUpdate(EUpdatePhase.Input).Subscribe(_ => InputSystem.Update()).AddTo(this);
         }
 
         private void OnEnable() => _actions.Enable(); // オブジェクトが有効なら入力システムを有効化

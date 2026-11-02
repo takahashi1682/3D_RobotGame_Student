@@ -1,12 +1,11 @@
-using System;
 using System.Threading;
 using _Projects.Input;
 using Cysharp.Threading.Tasks;
 using MyUtils.VContainerExtensions;
-using R3;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using R3;
 
 namespace _Projects.Unit
 {
@@ -52,13 +51,12 @@ namespace _Projects.Unit
             builder.RegisterComponent(this).As<ILookActionHandler, ILookActionObservable>();
         }
 
-        // private void Start()
-        // {
-        //     _updateObservable.OnUpdate(EUpdatePhase.CameraPrepare)
-        //         .Subscribe(_ => OnPhaseUpdate()).AddTo(this);
-        // }
-        private void Update() { OnPhaseUpdate(); }
-
+        private void Start()
+        {
+            _updateObservable.OnUpdate(EUpdatePhase.CameraPrepare)
+                .Subscribe(_ => OnPhaseUpdate()).AddTo(this);
+        }
+        
         public UniTask OnValueChanged(Vector2 value, CancellationToken ct = default)
         {
             // 入力値が0でなければアクションを実行

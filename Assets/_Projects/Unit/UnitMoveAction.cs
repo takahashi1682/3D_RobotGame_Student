@@ -100,8 +100,6 @@ namespace _Projects.Unit
 
             // オブジェクトの速度に移動方向と移動力を加算する
             _rigidbody.linearVelocity += moveDirection * (_currentPower * Time.fixedDeltaTime);
-            Debug.Log(moveDirection * (_currentPower * Time.fixedDeltaTime));
-            Debug.Log(_rigidbody.linearVelocity);
         }
 
         private void ApplyAutoStop()
