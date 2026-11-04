@@ -21,7 +21,7 @@ namespace _Projects.Unit
         IFlyActionObservable // interface実装
     {
         [Header("Settings")]
-        public float FlyForce = 10f; // 飛行中の上方向の力
+        public float FlyForce = 80f; // 飛行中の上方向の力
         public int FlyingEnergy = 1; // 飛行中に消費するエネルギー量
 
         [Inject] private Rigidbody _rigidbody; // コンテナからInject(注入)してもらう

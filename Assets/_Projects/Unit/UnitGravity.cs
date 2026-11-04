@@ -15,7 +15,7 @@ namespace _Projects.Unit
         IScopeRegisterable
     {
         [Header("Settings")]
-        public float Gravity = -2.25f; // 落下速度
+        public float Gravity = -5f; // 落下速度
         public Vector3 GravityDirection = Vector3.down; // 落下方向
 
         private float _currentGravity;
