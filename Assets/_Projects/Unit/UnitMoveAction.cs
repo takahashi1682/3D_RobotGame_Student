@@ -11,7 +11,7 @@ using VContainer.Unity;
 namespace _Projects.Unit
 {
     // ユニットの移動アクションを監視するためのインターフェイス
-    public interface IMoveObservable : IUnitActionObservable
+    public interface IMoveActionObservable : IUnitActionObservable
     {
     }
 
@@ -22,7 +22,7 @@ namespace _Projects.Unit
 
     public class UnitMoveAction : AbstractUnitAction, // 継承
         IScopeRegisterable,
-        IMoveObservable, // インターフェイスの実装①
+        IMoveActionObservable, // インターフェイスの実装①
         IMoveActionHandler // インターフェイスの実装②
     {
         [Header("References")] // Inspectorでの表示用
@@ -39,7 +39,7 @@ namespace _Projects.Unit
         private float _currentPower; // 現在の移動力
         [Inject] private Rigidbody _rigidbody; // ScopeRootから注入されたRigidbodyを取得
         [Inject] private GroundDetection _groundDetection;
-        // [Inject] private IBoostActionObservable _playerBoost;
+        [Inject] private IBoostActionObservable _playerBoost;
 
         protected override void Awake()
         {
@@ -95,8 +95,8 @@ namespace _Projects.Unit
         private void ApplyMove(Vector3 moveDirection)
         {
             // ブースト中はPlayerBoost.BoostPowerを目標に、それ以外はMovePowerを目標に近づける
-            // var targetPower = _playerBoost.IsAction.CurrentValue ? _playerBoost.BoostPower : MovePower;
-            // _currentPower = Mathf.Lerp(_currentPower, targetPower, PowerDownTime * Time.fixedDeltaTime);
+            var targetPower = _playerBoost.IsAction.CurrentValue ? _playerBoost.BoostPower : MovePower;
+            _currentPower = Mathf.Lerp(_currentPower, targetPower, PowerDownTime * Time.fixedDeltaTime);
 
             // オブジェクトの速度に移動方向と移動力を加算する
             _rigidbody.linearVelocity += moveDirection * (_currentPower * Time.fixedDeltaTime);
@@ -115,6 +115,6 @@ namespace _Projects.Unit
 
         // このクラスに実装されている二つのインターフェイスをVContainerに登録するためのメソッド
         public void OnRegister(IContainerBuilder builder) =>
-            builder.RegisterComponent(this).As<IMoveObservable, IMoveActionHandler>();
+            builder.RegisterComponent(this).As<IMoveActionObservable, IMoveActionHandler>();
     }
 }

@@ -31,6 +31,7 @@ namespace _Projects.Unit
         // 各アクションの操作用インターフ     [Inject] protected UnitStatus _playerStatus;ェイス
         [Inject] protected IMoveActionHandler _moveHandler;
         [Inject] protected IFlyActionHandler _flyHandler;
+        [Inject] protected IBoostActionHandler _boostHandler;
 
         protected virtual void Start()
         {
@@ -44,6 +45,12 @@ namespace _Projects.Unit
                 .Where(_ => _status.CanFly) // 現在飛行可能な状態かどうかを確認
                 .SubscribeAwait(async (value, cts) =>
                     await _flyHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
+                .AddTo(this);
+            
+            _control.Boost
+                .Where(_ => _status.CanBoost) // 現在ブースト可能な状態かどうかを確認
+                .SubscribeAwait(async (value, cts) =>
+                    await _boostHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
                 .AddTo(this);
         }
     }

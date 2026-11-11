@@ -1,5 +1,8 @@
+using System;
 using MyUtils.Parameter;
+using MyUtils.Parameter.Basic;
 using MyUtils.VContainerExtensions;
+using R3;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -50,6 +53,34 @@ namespace _Projects.Unit
             public bool CanFire => _canFlags.HasFlag(ECanFlags.Fire);
             public bool CanBoost => _canFlags.HasFlag(ECanFlags.Boost);
             public bool CanFly => _canFlags.HasFlag(ECanFlags.Fly);
+
+            private ILookActionObservable _look; // Startで取得する
+            [Inject] private IMoveActionObservable _move;
+            [Inject] private GroundDetection _ground;
+            [Inject] private IBoostActionObservable _boost;
+            // [Inject] private ILockOnActionObservable _lockOn;
+            // [Inject] private IFireActionObservable _fire;
+            [Inject] private Health _health;
+            // [Inject] private Energy _energy;
+
+            [Inject] private IObjectResolver _resolver; // このスコープのコンテナ
+
+            private void Start()
+            {
+                // このUnitがLookActionを持っている場合のみ、Lookの状態を監視する
+                if (_resolver.TryResolve(out _look))
+                {
+                    _look.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Look, x)).AddTo(this);
+                }
+
+                _move.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Move, x)).AddTo(this);
+                _ground.IsHit.Subscribe(x => _stateFlags.SetFlag(EUnitState.Grounded, x)).AddTo(this);
+                _boost.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Boost, x)).AddTo(this);
+                //  _lockOn.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.LockOn, x)).AddTo(this);
+                //  _fire.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Fire, x)).AddTo(this);
+                _health.IsEmpty.Subscribe(x => _stateFlags.SetFlag(EUnitState.Dead, x)).AddTo(this);
+                // _energy.IsEmpty.Subscribe(x => _stateFlags.SetFlag(EUnitState.EnergyEmpty, x)).AddTo(this);
+            }
 
             private void Update()
             {

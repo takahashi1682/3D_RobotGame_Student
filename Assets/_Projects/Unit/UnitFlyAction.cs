@@ -25,7 +25,7 @@ namespace _Projects.Unit
         public int FlyingEnergy = 1; // 飛行中に消費するエネルギー量
 
         [Inject] private Rigidbody _rigidbody; // コンテナからInject(注入)してもらう
-        // [Inject] private Energy _energy;
+        [Inject] private Energy _energy;
 
         public void OnRegister(IContainerBuilder builder)
         {
@@ -43,14 +43,17 @@ namespace _Projects.Unit
         {
             if (!IsAction.CurrentValue) return; // アクション中でなければ何もしない
 
-            // if (_energy.CurrentValue <= 0)
-            // {
-            //     CancelAction();
-            //     return;
-            // }
+            // エネルギーが0になったらアクションをキャンセルする
+            if (_energy.CurrentValue <= 0)
+            {
+                CancelAction();
+                return;
+            }
 
             ApplyFly();
-            // _energy.Sub(FlyingEnergy);
+
+            // エネルギーを消費する
+            _energy.Sub(FlyingEnergy);
         }
 
         /// <summary>
