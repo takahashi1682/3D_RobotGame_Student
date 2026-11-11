@@ -31,7 +31,7 @@ namespace _Projects.Input
                     // 1秒間隔でランダムな行動を試みる
                     TryPress(_fly, FlyRate, Random.Range(1f, 2f)); // 1秒~2秒の間ボタンを押す
                     TryPress(_fire, FireRate, Random.Range(1f, 2f));　// 1秒~2秒の間ボタンを押す
-                    TryPress(_boost, BoostRate, Random.Range(1f, 2f));　// 1秒~2秒の間ボタンを押す
+                    TryPress(_boost, BoostRate, 0.1f);　// 一瞬だけボタンを押す
                 })
                 .AddTo(this);
         }
