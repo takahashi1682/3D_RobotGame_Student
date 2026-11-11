@@ -28,7 +28,7 @@ namespace _Projects.Unit
         public int BoostDuration = 300; // ブーストの持続時間
         public int BoostInterval = 300; // ブースト後のインターバル時間
 
-        //[Inject] private Energy _energy;
+        [Inject] private Energy _energy; // コンテナからInject(注入)してもらう
 
         float IBoostActionObservable.BoostPower => BoostPower;
         int IBoostActionObservable.BoostEnergy => BoostEnergy;
@@ -44,7 +44,7 @@ namespace _Projects.Unit
             if (IsAction.CurrentValue) return; // すでにブースト中なら処理しない
             _isAction.Value = true; // ブースト中にする
 
-            // _energy.Sub(BoostEnergy);
+            _energy.Sub(BoostEnergy); // ブースト時にEnergyを減算
 
             await UniTask.Delay(BoostDuration, cancellationToken: ct);
             _isAction.Value = false;
