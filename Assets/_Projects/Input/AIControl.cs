@@ -1,8 +1,10 @@
 using System;
 using System.Threading;
+using _Projects.Unit;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
+using VContainer;
 using Random = UnityEngine.Random;
 
 namespace _Projects.Input
@@ -10,6 +12,8 @@ namespace _Projects.Input
     public class AIControl : AbstractUnitControllable
     {
         public override string LookDeviceName => string.Empty;
+
+        [Inject] private IUnitTrackingObservable _trackingObservable;
 
         [Header("Settings")]
         public float ThinkingInterval = 1f; // AIの思考間隔（秒）
@@ -32,6 +36,12 @@ namespace _Projects.Input
                     TryPress(_fly, FlyRate, Random.Range(1f, 2f)); // 1秒~2秒の間ボタンを押す
                     TryPress(_fire, FireRate, Random.Range(1f, 2f));　// 1秒~2秒の間ボタンを押す
                     TryPress(_boost, BoostRate, 0.1f);　// 一瞬だけボタンを押す
+
+                    // ターゲットが見えている場合はロックオンを試みる
+                    if (_trackingObservable.Target.CurrentValue == null)
+                    {
+                        TryPress(_lockOn, 1, 0.1f);　// 一瞬だけボタンを押す
+                    }
                 })
                 .AddTo(this);
         }

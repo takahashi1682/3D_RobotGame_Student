@@ -1,3 +1,4 @@
+using System;
 using MyUtils.Parameter.Basic;
 using MyUtils.VContainerExtensions;
 using R3;
@@ -10,7 +11,7 @@ namespace _Projects.Unit
     public class UnitScopeRoot : AbstractScopeRoot
     {
         // このユニットが動けるかの判定（ゲーム終了したり死んだらFalseに変わる）
-        [SerializeField] private SerializableReactiveProperty<bool> _running = new();
+        [SerializeField] private SerializableReactiveProperty<bool> _running = new(true);
         public ReadOnlyReactiveProperty<bool> Running => _running;
 
         [SerializeField] private Rigidbody _rigidbody;
@@ -19,6 +20,7 @@ namespace _Projects.Unit
         [field: SerializeField] public UnitSetting Setting { get; private set; }
         [field: SerializeField] public Health Health { get; private set; }
         [field: SerializeField] public Energy Energy { get; private set; }
+        [Inject] private IUnitManager _unitManager;
 
         private void Awake()
         {
@@ -28,6 +30,16 @@ namespace _Projects.Unit
             Health.SetFull(); // 現在値をFullにする
             Energy.SetMax(Setting.MaxEnergy);
             Energy.SetFull();
+        }
+
+        private void Start()
+        {
+            // 体力が0になったらUnitManagerから削除する
+            Health.IsEmpty.Subscribe(x =>
+            {
+                if (x) _unitManager.RemoveUnit(this);
+                else _unitManager.RegisterUnit(this);
+            }).AddTo(this);
         }
 
         // このスコープでコンテナが作られる時に呼ばれるメソッド
@@ -42,6 +54,8 @@ namespace _Projects.Unit
             builder.RegisterComponent(Health);
             // コンテナにEnergyを登録する
             builder.RegisterComponent(Energy);
+
+            builder.RegisterComponent(Setting);
         }
     }
 }

@@ -19,7 +19,6 @@ namespace _Projects.Unit
         [SerializeField] private float _defaultLightIntensity = 10f; // ライトの強さの初期値
         [SerializeField] private float _boostLightIntensity = 200f; // ライトの強さ
 
-        private static readonly int _boostHash = Animator.StringToHash("Boost");
         private static readonly int _groundHash = Animator.StringToHash("Ground");
         private static readonly int _moveXHash = Animator.StringToHash("MoveX");
         private static readonly int _moveZHash = Animator.StringToHash("MoveZ");
@@ -42,11 +41,21 @@ namespace _Projects.Unit
                     var deltaTime = Time.deltaTime;
                     var isBoost = _boost.IsAction.CurrentValue;
 
+                    // ブーストのアニメーションの重みをゆっくり変化させる
+                    UpdateBoostWeight(isBoost, deltaTime);
+
                     // ブースト時のライトの光量をゆっくり変化させる
                     UpdateBoostLight(isBoost, deltaTime);
-                    UpdateAnimatorParameters(isBoost, _unitMove.MoveDirection, deltaTime);
+                    UpdateAnimatorParameters(_unitMove.MoveDirection, deltaTime);
                 })
                 .AddTo(this);
+        }
+
+        private void UpdateBoostWeight(bool isBoost, float deltaTime)
+        {
+            var currentWeight = _animator.GetLayerWeight(1);
+            var targetWeight = isBoost ? 1 : 0;
+            _animator.SetLayerWeight(1, Mathf.Lerp(currentWeight, targetWeight, deltaTime * _tweenSpeed));
         }
 
         private void UpdateBoostLight(bool isBoost, float deltaTime)
@@ -56,10 +65,9 @@ namespace _Projects.Unit
             _boostLight.intensity = Mathf.Lerp(_boostLight.intensity, targetIntensity, deltaTime * _tweenSpeed);
         }
 
-        private void UpdateAnimatorParameters(bool isBoost, Vector3 moveDirection, float deltaTime)
+        private void UpdateAnimatorParameters(Vector3 moveDirection, float deltaTime)
         {
             // 各アニメーションパラメータを更新する
-            _animator.SetBool(_boostHash, isBoost);
             _animator.SetBool(_groundHash, _groundDetection.IsHit.CurrentValue);
             _animator.SetFloat(_moveXHash, moveDirection.x, _dampTime, deltaTime); // 減衰時間を指定して値をゆっくり反映
             _animator.SetFloat(_moveZHash, moveDirection.z, _dampTime, deltaTime); // 減衰時間を指定して値をゆっくり反映

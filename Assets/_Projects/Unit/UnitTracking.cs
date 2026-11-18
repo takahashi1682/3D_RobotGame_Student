@@ -74,6 +74,7 @@ namespace _Projects.Unit
             TargetPosition = _targetPivot.position;
 
             _isAction.Value = true;
+            Debug.Log($"SetTarget: {_target.Value.name}, MaxDistance: {MaxDistance}");
         }
 
         public void ClearTarget()
@@ -136,7 +137,6 @@ namespace _Projects.Unit
             if (!_isAction.CurrentValue) return false;
             if (_target.Value == null) return false;
             if (!_target.CurrentValue.Running.CurrentValue) return false;
-
             Distance = Vector3.Distance(_unitSetting.Pivot, _targetPivot.position);
             return Distance < MaxDistance;
         }

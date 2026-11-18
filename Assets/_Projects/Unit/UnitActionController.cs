@@ -32,6 +32,7 @@ namespace _Projects.Unit
         [Inject] protected IMoveActionHandler _moveHandler;
         [Inject] protected IFlyActionHandler _flyHandler;
         [Inject] protected IBoostActionHandler _boostHandler;
+        [Inject] protected ILockOnActionHandler _lockOnHandler;
 
         protected virtual void Start()
         {
@@ -46,11 +47,17 @@ namespace _Projects.Unit
                 .SubscribeAwait(async (value, cts) =>
                     await _flyHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
                 .AddTo(this);
-            
+
             _control.Boost
                 .Where(_ => _status.CanBoost) // 現在ブースト可能な状態かどうかを確認
                 .SubscribeAwait(async (value, cts) =>
                     await _boostHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
+                .AddTo(this);
+            
+            _control.LockOn
+                .Where(_ => _status.CanLockOn) // 現在ロックオン可能な状態かどうかを確認
+                .SubscribeAwait(async (value, cts) =>
+                    await _lockOnHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
                 .AddTo(this);
         }
     }
