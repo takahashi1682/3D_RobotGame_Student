@@ -33,6 +33,7 @@ namespace _Projects.Unit
         [Inject] protected IFlyActionHandler _flyHandler;
         [Inject] protected IBoostActionHandler _boostHandler;
         [Inject] protected ILockOnActionHandler _lockOnHandler;
+        [Inject] protected IFireActionHandler _fireHandler;
 
         protected virtual void Start()
         {
@@ -58,6 +59,12 @@ namespace _Projects.Unit
                 .Where(_ => _status.CanLockOn) // 現在ロックオン可能な状態かどうかを確認
                 .SubscribeAwait(async (value, cts) =>
                     await _lockOnHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
+                .AddTo(this);
+            
+            _control.Fire
+                .Where(_ => _status.CanFire) // 現在射撃可能な状態かどうかを確認
+                .SubscribeAwait(async (value, cts) =>
+                    await _fireHandler.OnValueChanged(value, cts), AwaitOperation.Drop) // アクションの実行（値を渡す）
                 .AddTo(this);
         }
     }

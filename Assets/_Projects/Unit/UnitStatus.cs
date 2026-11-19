@@ -59,7 +59,7 @@ namespace _Projects.Unit
             [Inject] private GroundDetection _ground;
             [Inject] private IBoostActionObservable _boost;
             [Inject] private ILockOnActionObservable _lockOn;
-            // [Inject] private IFireActionObservable _fire;
+            [Inject] private IFireActionObservable _fire;
             [Inject] private Health _health;
             [Inject] private Energy _energy;
 
@@ -77,7 +77,7 @@ namespace _Projects.Unit
                 _ground.IsHit.Subscribe(x => _stateFlags.SetFlag(EUnitState.Grounded, x)).AddTo(this);
                 _boost.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Boost, x)).AddTo(this);
                 _lockOn.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.LockOn, x)).AddTo(this);
-                //  _fire.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Fire, x)).AddTo(this);
+                _fire.IsAction.Subscribe(x => _stateFlags.SetFlag(EUnitState.Fire, x)).AddTo(this);
                 _health.IsEmpty.Subscribe(x => _stateFlags.SetFlag(EUnitState.Dead, x)).AddTo(this);
                 _energy.IsEmpty.Subscribe(x => _stateFlags.SetFlag(EUnitState.EnergyEmpty, x)).AddTo(this);
             }
